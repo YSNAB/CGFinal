@@ -5,8 +5,8 @@
 CC=gcc
 CFLAGS=-lglut -lGLU -lGL -lm -lstdc++
 
-main: cannon.cpp
-	$(CC) -o cannon cannon.cpp  $(CFLAGS)
+main: main.cpp
+	$(CC) -o main main.cpp  $(CFLAGS)
 
 
 
