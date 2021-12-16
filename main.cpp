@@ -27,10 +27,8 @@ void fireCannon()
 
 void drawOneParticle()
 {
-
     glBegin(GL_QUADS); // Begin drawing the color cube with 6 quads
-                       // Top face (y = 1.0f)
-                       // Define vertices in counter-clockwise (CCW) order with normal pointing out
+
     glVertex3f(1.0f, 1.0f, -1.0f);
     glVertex3f(-1.0f, 1.0f, -1.0f);
     glVertex3f(-1.0f, 1.0f, 1.0f);
@@ -70,6 +68,8 @@ void drawOneParticle()
 
 void drawParticles(pinfo *particles)
 {
+    //glutSolidSphere(1.0, 10, 8);
+
     unsigned int i;
     for (i = 0; i < MAXPARTICLES; i = i + 1)
     {
@@ -138,22 +138,33 @@ void update()
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    glColor3f(1.0, 1.0, 1.0);
-    // cannon base
-    glBegin(GL_QUADS);
-    glVertex3f(-5.0, 0.0, -5.0);
-    glVertex3f(-5.0, 0.0, 5.0);
-    glVertex3f(5.0, 0.0, 5.0);
-    glVertex3f(5.0, 0.0, -5.0);
-    glEnd();
+    GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat mat_shininess[] = {10.0};
+    GLfloat light_position[] = {GLfloat(elements[0].getParticles()[0].x), GLfloat(elements[0].getParticles()[0].y), GLfloat(elements[0].getParticles()[0].z), 0.0};
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glShadeModel(GL_SMOOTH);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
+
+    //glutSolidCube(10);
+
     // ground plane
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(-PLANE, 0.0, -PLANE);
-    glVertex3f(-PLANE, 0.0, PLANE);
-    glVertex3f(PLANE, 0.0, PLANE);
-    glVertex3f(PLANE, 0.0, -PLANE);
-    glVertex3f(-PLANE, 0.0, -PLANE);
+    glBegin(GL_QUADS);
+    glNormal3d(0, 1, 0);
+    glVertex3f(-PLANE, -1.0, -PLANE);
+    glVertex3f(-PLANE, -1.0, PLANE);
+    glVertex3f(PLANE, -1.0, PLANE);
+    glVertex3f(PLANE, -1.0, -PLANE);
+    glVertex3f(-PLANE, -1.0, -PLANE);
     glEnd();
+
+    glDisable(GL_LIGHTING);
 
     for (int i = 0; i < NFIREWORKS; i++)
     {
@@ -193,6 +204,7 @@ int main(int argc, char *argv[])
     {
         elements[i] = Firework(xpos[i], 0, zpos[i], hoogte[i], speeds[i]);
     }
+
     srand(time(NULL));
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);

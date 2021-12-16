@@ -87,6 +87,21 @@ public:
     return particles;
   }
 
+  float getX()
+  {
+    return posx;
+  }
+
+  float getY()
+  {
+    return posy;
+  }
+
+  float getZ()
+  {
+    return posz;
+  }
+
 private:
   pinfo particles[1000];
   float gravity_force = 15.0f;
