@@ -172,6 +172,11 @@ public:
     return posz;
   }
 
+  bool getDescending()
+  {
+    return descending;
+  }
+
 private:
   int typeExplosion;
   pinfo particles[1000];

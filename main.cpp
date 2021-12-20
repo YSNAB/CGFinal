@@ -141,41 +141,45 @@ void update()
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    GLfloat mat_specular[] = {
-        fw.getParticles()[0].width * 10,
-        fw.getParticles()[0].width * 10,
-        fw.getParticles()[0].width * 10, 1.0};
+    if (fw.getDescending())
+    {
 
-    GLfloat mat_ambient[] = {fw.getParticles()[0].r * fw.getParticles()[0].width,
-                             fw.getParticles()[0].g * fw.getParticles()[0].width,
-                             fw.getParticles()[0].b * fw.getParticles()[0].width, 1.0};
-    GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
-    GLfloat mat_shininess[] = {60.0};
+        GLfloat mat_specular[] = {
+            fw.getParticles()[0].width * 2,
+            fw.getParticles()[0].width * 2,
+            fw.getParticles()[0].width * 2, 1.0};
 
-    GLfloat spot_direction[] = {0.0, -1.0, 0.0};
+        GLfloat mat_ambient[] = {fw.getParticles()[0].r * fw.getParticles()[0].width * 10,
+                                 fw.getParticles()[0].g * fw.getParticles()[0].width * 10,
+                                 fw.getParticles()[0].b * fw.getParticles()[0].width * 10, 1.0};
+        GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+        GLfloat mat_shininess[] = {50.0};
 
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glShadeModel(GL_SMOOTH);
+        GLfloat spot_direction[] = {0.0, -1.0, 0.0};
 
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+        glClearColor(0.0, 0.0, 0.0, 0.0);
+        glShadeModel(GL_SMOOTH);
 
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 5000);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
-    GLfloat light_position[] = {0.0, 0.0, 0.0, 1.0};
-    fw.getGemX(light_position);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+        glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 5000);
+
+        GLfloat light_position[] = {0.0, 0.0, 0.0, 1.0};
+        fw.getGemX(light_position);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
+        glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+    }
 
     // ground plane
     glBegin(GL_QUADS);
     glNormal3d(0, 1, 0);
-    glColor3b(0, 0, 45);
+    glColor3b(0, 0, 0);
     glVertex3f(-PLANE, 0.0, -PLANE);
     glVertex3f(-PLANE, 0.0, PLANE);
     glVertex3f(PLANE, 0.0, PLANE);
