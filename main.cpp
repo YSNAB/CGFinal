@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include "GL/glut.h"
 #define _USE_MATH_DEFINES
-#define MAXPARTICLES 20
-#define NFIREWORKS 1
+#define MAXPARTICLES 100
 #define PLANE 40.0
 #include <math.h>
 #include <time.h>
@@ -15,14 +14,22 @@ float g_posX = posx_init, g_posY = posy_init, g_posZ = posy_init;
 float g_orientation = orientation_init; // y axis
 float randR, randG, randB;
 
-Firework elements[NFIREWORKS];
+Firework fw;
 
 void fireCannon()
 {
-    for (int i = 0; i < NFIREWORKS; i++)
-    {
-        elements[i].fire();
-    }
+    float zpos = 0.0f;
+    float xpos = 0.0f;
+    float hoogte = 40.0f;
+    float speed = 50.0f;
+    float type = rand() % 3;
+    float r = rand() / (float)RAND_MAX;
+    float g = rand() / (float)RAND_MAX;
+    float b = rand() / (float)RAND_MAX;
+
+    fw = Firework(xpos, 0, zpos, hoogte, speed, r, g, b, type);
+
+    fw.fire();
 }
 
 void drawOneParticle()
@@ -68,12 +75,9 @@ void drawOneParticle()
 
 void drawParticles(pinfo *particles)
 {
-    //glutSolidSphere(1.0, 10, 8);
-
     unsigned int i;
     for (i = 0; i < MAXPARTICLES; i = i + 1)
     {
-
         glPushMatrix();
         glTranslatef(particles[i].x, particles[i].y, particles[i].z);
         glScalef(particles[i].width, particles[i].width, particles[i].width);
@@ -81,6 +85,8 @@ void drawParticles(pinfo *particles)
         drawOneParticle();
         glPopMatrix();
     }
+
+    glDisable(GL_LIGHT1);
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -111,10 +117,7 @@ void keyboard(unsigned char key, int x, int y)
         fireCannon();
         break;
     case 'g':
-        for (int i = 0; i < NFIREWORKS; i++)
-        {
-            elements[i].toggleGravity();
-        }
+        fw.toggleGravity();
         break;
 
     case 'q': // exit
@@ -138,38 +141,51 @@ void update()
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat mat_shininess[] = {10.0};
-    GLfloat light_position[] = {GLfloat(elements[0].getParticles()[0].x), GLfloat(elements[0].getParticles()[0].y), GLfloat(elements[0].getParticles()[0].z), 0.0};
+    GLfloat mat_specular[] = {
+        fw.getParticles()[0].width * 10,
+        fw.getParticles()[0].width * 10,
+        fw.getParticles()[0].width * 10, 1.0};
+
+    GLfloat mat_ambient[] = {fw.getParticles()[0].r * fw.getParticles()[0].width,
+                             fw.getParticles()[0].g * fw.getParticles()[0].width,
+                             fw.getParticles()[0].b * fw.getParticles()[0].width, 1.0};
+    GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat mat_shininess[] = {60.0};
+
+    GLfloat spot_direction[] = {0.0, -1.0, 0.0};
+
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glShadeModel(GL_SMOOTH);
 
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 5000);
+
+    GLfloat light_position[] = {0.0, 0.0, 0.0, 1.0};
+    fw.getGemX(light_position);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    glEnable(GL_DEPTH_TEST);
-
-    //glutSolidCube(10);
 
     // ground plane
     glBegin(GL_QUADS);
     glNormal3d(0, 1, 0);
-    glVertex3f(-PLANE, -1.0, -PLANE);
-    glVertex3f(-PLANE, -1.0, PLANE);
-    glVertex3f(PLANE, -1.0, PLANE);
-    glVertex3f(PLANE, -1.0, -PLANE);
-    glVertex3f(-PLANE, -1.0, -PLANE);
+    glColor3b(0, 0, 45);
+    glVertex3f(-PLANE, 0.0, -PLANE);
+    glVertex3f(-PLANE, 0.0, PLANE);
+    glVertex3f(PLANE, 0.0, PLANE);
+    glVertex3f(PLANE, 0.0, -PLANE);
+    glVertex3f(-PLANE, 0.0, -PLANE);
     glEnd();
 
     glDisable(GL_LIGHTING);
 
-    for (int i = 0; i < NFIREWORKS; i++)
-    {
-        drawParticles(elements[i].getParticles());
-    }
+    drawParticles(fw.getParticles());
 
     glutSwapBuffers();
 }
@@ -185,10 +201,7 @@ void timer(int value)
     time = (thisTime - lastTime) / 500.0;
     lastTime = thisTime;
 
-    for (int i = 0; i < NFIREWORKS; i++)
-    {
-        elements[i].update(time);
-    }
+    fw.update(time);
 
     glutPostRedisplay();
     glutTimerFunc(50, &timer, 0);
@@ -196,15 +209,6 @@ void timer(int value)
 
 int main(int argc, char *argv[])
 {
-    float xpos[3] = {-20.0f, 10.0f, 15.0f};
-    float zpos[3] = {-10.0f, 14.0f, 7.0f};
-    float hoogte[3] = {20.0f, 20.0f, 40.0f};
-    float speeds[3] = {30.0f, 30.0f, 60.0f};
-    for (int i = 0; i < NFIREWORKS; i++)
-    {
-        elements[i] = Firework(xpos[i], 0, zpos[i], hoogte[i], speeds[i]);
-    }
-
     srand(time(NULL));
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);

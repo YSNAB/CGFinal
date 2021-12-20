@@ -1,4 +1,4 @@
-#define MAXPARTICLES 20
+#define MAXPARTICLES 100
 
 struct pinfo
 {
@@ -12,7 +12,7 @@ class Firework
 {
 public:
   Firework(){};
-  Firework(float x, float y, float z, float hoogte, float speed)
+  Firework(float x, float y, float z, float hoogte, float speed, float r, float g, float b, float typeex)
   {
     posx = x;
     posy = y;
@@ -20,6 +20,10 @@ public:
     firehoogte = hoogte;
     gravity = true;
     launchspeed = speed;
+    color_r = r;
+    color_g = g;
+    color_b = b;
+    typeExplosion = typeex;
   }
   ~Firework(){};
 
@@ -28,16 +32,16 @@ public:
     descending = false;
     for (int i = 0; i < MAXPARTICLES; i = i + 1)
     {
-      particles[i].width = 0.5f;
+      particles[i].width = 1.0f;
       particles[i].x = posx;
       particles[i].y = posy;
       particles[i].z = posz;
       particles[i].v_x = 10.0 * (rand() / (float)RAND_MAX) - 5.0f;
       particles[i].v_y = launchspeed;
       particles[i].v_z = 10.0 * (rand() / (float)RAND_MAX) - 5.0f;
-      particles[i].r = 1.0 * (rand() / (float)RAND_MAX);
-      particles[i].g = 1.0 * (rand() / (float)RAND_MAX);
-      particles[i].b = 1.0 * (rand() / (float)RAND_MAX);
+      particles[i].r = color_r;
+      particles[i].g = color_g;
+      particles[i].b = color_b;
     }
   }
 
@@ -65,16 +69,82 @@ public:
 
       if (descending)
       {
-        particles[i].x = particles[i].x + particles[i].v_x * time;
-        particles[i].z = particles[i].z + particles[i].v_z * time;
+        if (typeExplosion == 0)
+        {
+          particles[i].x = particles[i].x + particles[i].v_x * time;
+          particles[i].z = particles[i].z + particles[i].v_z * time;
+        }
+        else if (typeExplosion == 1)
+        {
+          float x = cos(i * 2 * M_PI / MAXPARTICLES);
+          float z = sin(i * 2 * M_PI / MAXPARTICLES);
+          particles[i].x += x;
+          particles[i].z += z;
+        }
+        else if (typeExplosion == 2)
+        {
+          float circleAngle = i * 2 * M_PI / sqrt(MAXPARTICLES);
+          for (int j = 0; j < sqrt(MAXPARTICLES); j++)
+          {
+            float x = cos(j * 2 * M_PI / sqrt(MAXPARTICLES)) * cos(circleAngle);
+            float y = sin(j * 2 * M_PI / sqrt(MAXPARTICLES)) * cos(circleAngle);
+            float z = sin(circleAngle);
+            int index = j + i * (int)sqrt(MAXPARTICLES);
+            particles[index].x += x;
+            particles[index].y += y;
+            particles[index].z += z;
+          }
+        }
+        else if (typeExplosion == 3)
+        {
+          float x = cos(i * 2 * M_PI / MAXPARTICLES);
+          float z = sin(i * 2 * M_PI / MAXPARTICLES);
+          float y = 0;
+          if (i % 3 == 0)
+          {
+            y = x;
+          }
+          else if (i % 3 == 1)
+          {
+            y = -x;
+          }
+          else
+          {
+            y = -z;
+          }
+          particles[i].x += x;
+          particles[i].y += y;
+          particles[i].z += z;
+        }
         if (particles[i].width > 0.0f)
         {
           particles[i].width -= scale_over_time;
+        }
+        else if (particles[i].width < 0.0f)
+        {
+          particles[i].width = 0;
         }
       }
 
       particles[i].y = particles[i].y + particles[i].v_y * time;
     }
+  }
+
+  void getGemX(GLfloat *lpos)
+  {
+
+    lpos[0] = 0.0;
+    lpos[1] = 0.0;
+    lpos[2] = 0.0;
+    for (int i = 0; i < MAXPARTICLES; i++)
+    {
+      lpos[0] += particles[i].x;
+      lpos[1] += particles[i].y;
+      lpos[2] += particles[i].z;
+    }
+    lpos[0] /= MAXPARTICLES;
+    lpos[1] /= MAXPARTICLES;
+    lpos[2] /= MAXPARTICLES;
   }
 
   void toggleGravity()
@@ -103,12 +173,16 @@ public:
   }
 
 private:
+  int typeExplosion;
   pinfo particles[1000];
   float gravity_force = 15.0f;
-  float scale_over_time = 0.01f;
+  float scale_over_time = 0.02f;
   bool descending;
   bool gravity;
   float firehoogte;
   float posx, posy, posz;
   float launchspeed;
+  float color_r;
+  float color_g;
+  float color_b;
 };
