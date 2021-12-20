@@ -24,6 +24,7 @@ public:
     color_g = g;
     color_b = b;
     typeExplosion = typeex;
+    sounded = false;
   }
   ~Firework(){};
 
@@ -177,6 +178,16 @@ public:
     return descending;
   }
 
+  bool getSounded()
+  {
+    return sounded;
+  }
+
+  void setSounded(bool to)
+  {
+    sounded = to;
+  }
+
 private:
   int typeExplosion;
   pinfo particles[1000];
@@ -190,4 +201,5 @@ private:
   float color_r;
   float color_g;
   float color_b;
+  bool sounded;
 };

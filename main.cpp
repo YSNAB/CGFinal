@@ -7,6 +7,9 @@
 #include <time.h>
 #include <iostream>
 
+#include "SDL2/SDL.h"
+#include "audio.h"
+
 #include "firework.h"
 
 float posx_init = 0.0, posy_init = 25.0, posz_init = 50.0, orientation_init = 15.0;
@@ -143,7 +146,12 @@ void update()
 
     if (fw.getDescending())
     {
-
+        if (!fw.getSounded())
+        {
+            std::cout << "Sound" << std::endl;
+            playSound("explosion.wav", SDL_MIX_MAXVOLUME / 2);
+            fw.setSounded(true);
+        }
         GLfloat mat_specular[] = {
             fw.getParticles()[0].width * 2,
             fw.getParticles()[0].width * 2,
@@ -213,6 +221,12 @@ void timer(int value)
 
 int main(int argc, char *argv[])
 {
+    if (SDL_Init(SDL_INIT_AUDIO) < 0)
+    {
+        return 1;
+    }
+    initAudio();
+
     srand(time(NULL));
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);
