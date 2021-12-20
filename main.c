@@ -7,7 +7,7 @@
 #include <time.h>
 #include <iostream>
 
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 #include "audio.h"
 
 #include "firework.h"
@@ -149,7 +149,7 @@ void update()
         if (!fw.getSounded())
         {
             std::cout << "Sound" << std::endl;
-            playSound("explosion.wav", SDL_MIX_MAXVOLUME / 2);
+            playSound("sounds/expl.wav", SDL_MIX_MAXVOLUME / 2);
             fw.setSounded(true);
         }
         GLfloat mat_specular[] = {
@@ -226,6 +226,8 @@ int main(int argc, char *argv[])
         return 1;
     }
     initAudio();
+
+    playSound("explosion.wav", SDL_MIX_MAXVOLUME / 2);
 
     srand(time(NULL));
     glutInit(&argc, argv);
