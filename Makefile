@@ -3,7 +3,7 @@
 # For more depth, see http://www.gnu.org/software/make/manual/make.html
 
 CC=g++
-CFLAGS=`sdl-config --libs` -g `sdl-config --cflags` -lglut  -lSDL2 -lGLU -lGL -lm -lstdc++ 
+CFLAGS=-lglut -lSDL2 -lGLU -lGL -lm -lstdc++ 
 
-main: main.cpp
-	$(CC) -o main main.cpp audio.c  $(CFLAGS)
+main: main.c
+	$(CC) -o main main.c audio.c  $(CFLAGS)

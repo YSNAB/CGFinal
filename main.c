@@ -148,7 +148,6 @@ void update()
     {
         if (!fw.getSounded())
         {
-            std::cout << "Sound" << std::endl;
             playSound("sounds/expl.wav", SDL_MIX_MAXVOLUME / 2);
             fw.setSounded(true);
         }
