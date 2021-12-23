@@ -226,8 +226,6 @@ int main(int argc, char *argv[])
     }
     initAudio();
 
-    playSound("explosion.wav", SDL_MIX_MAXVOLUME / 2);
-
     srand(time(NULL));
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);
